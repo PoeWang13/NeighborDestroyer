@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977400a6967278f4dbc755fc0a123eed, type: 3}
   m_Name: Tile_2
   m_EditorClassIdentifier: 
-  point: 0
-  icon: {fileID: 21300000, guid: 65f0e363b74cf5845ab8c3fbc14f39ac, type: 3}
+  point: 2
+  icon: {fileID: 21300000, guid: d4b7ec364d33b4f4bb41ff77bea034d0, type: 3}
