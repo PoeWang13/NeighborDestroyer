@@ -1,8 +1,6 @@
 using TMPro;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.UI;
-using System.Collections.Generic;
 
 public class Canvas_Manager : MonoBehaviour
 {

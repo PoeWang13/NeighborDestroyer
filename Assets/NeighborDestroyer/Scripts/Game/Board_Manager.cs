@@ -1,26 +1,7 @@
 ﻿using DG.Tweening;
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
-using System;
-using Random = UnityEngine.Random;
-using System.Linq;
 
-//[Serializable]
-//public class SwapTile
-//{
-//	public int order;
-//	public List<Tile> swapTile = new List<Tile>();
-
-//	public SwapTile(int order)
-//    {
-//		this.order = order;
-//	}
-//	public void AddTile(int order, Tile tile)
-//	{
-//		swapTile.Add(tile);
-//	}
-//}
 public class Board_Manager : MonoBehaviour
 {
     private static Board_Manager instance;
@@ -36,19 +17,18 @@ public class Board_Manager : MonoBehaviour
 	private int scoreAdd = 0;
     private int width;
 	private int height;
+	private int totalSwapTiles = 0;
 	private bool waitForChoosing;
 	private Tile choosedTile;
 	private List<Tile> choosedTiles = new List<Tile>();
 
 	private Tile[,] myTile;
 	private Dictionary<int, List<Tile>> swapTiles = new Dictionary<int, List<Tile>>();
-	public List<Item> BoardItemList { get => boardItemList; }
 	public Tile[,] Tiles { get => myTile; }
 	public int Width { get => width; }
 	public int Height { get => height; }
 	public int ScoreAdd { get => scoreAdd; }
 	public int Score { get => score; set => score = value; }
-	public bool WaitForChoosing { get => waitForChoosing; }
 
 	[ContextMenu("Set Board")]
 	private void SetBoard()
@@ -82,7 +62,7 @@ public class Board_Manager : MonoBehaviour
 		choosedTiles.Clear();
         if (!shrinkingBoard)
 		{
-			SwapTilesList();
+			SetSwapTilesList();
 		}
 
 		for (int h = 0; h < Width; h++)
@@ -101,15 +81,6 @@ public class Board_Manager : MonoBehaviour
         {
 
 			tile.SetMyNeighbors();
-		}
-	}
-	private void SwapTilesList()
-	{
-		swapTiles.Clear();
-		for (int e = 0; e < width; e++)
-		{
-			int order = e;
-			swapTiles.Add(order, new List<Tile>());
 		}
 	}
 	public void ChooseTile(Tile tile)
@@ -132,18 +103,10 @@ public class Board_Manager : MonoBehaviour
 			CheckBoardForConnecting();
 		}
 	}
-	private void SetChoosedTile(Tile tile)
-	{
-		choosedTile = tile;
-		choosedTiles.Add(choosedTile);
-	}
-	private void ClearChoosedTile()
-	{
-		waitForChoosing = false;
-		choosedTile = null;
-		choosedTiles.Clear();
-	}
-	void CheckBoardForConnecting()
+	/// <summary>
+	/// Check choosed tiles for same tiles.
+	/// </summary>
+	private void CheckBoardForConnecting()
 	{
 		waitForChoosing = true;
 		for (int h = 0; h < choosedTiles.Count; h++)
@@ -165,6 +128,13 @@ public class Board_Manager : MonoBehaviour
 				}
             }
 		}
+		CheckAndDestroyConnectedTiles();
+	}
+	/// <summary>
+	/// Destroy choosedTiles if choosedTiles amount bigger than 2.
+	/// </summary>
+	private void CheckAndDestroyConnectedTiles()
+	{
 		if (choosedTiles.Count > 2)
 		{
 			for (int h = 0; h < choosedTiles.Count; h++)
@@ -183,11 +153,14 @@ public class Board_Manager : MonoBehaviour
 				GoDownTile();
 			}
 		}
-        else
-        {
+		else
+		{
 			ClearChoosedTile();
 		}
 	}
+	/// <summary>
+	/// Send down tiles if their below tiles coordinate is null
+	/// </summary>
 	private void ShrinkBoard()
 	{
 		for (int h = 0; h < Width; h++)
@@ -205,52 +178,57 @@ public class Board_Manager : MonoBehaviour
             }
 		}
 		LearnNeighbors();
-		DOTween.To(value => { }, startValue: 0, endValue: 1, duration: DoTweenDuration * 2)
-                .OnComplete(() =>
-				{
-					SendLeftSide();
-				});
+		SendLeftSide();
 	}
+	/// <summary>
+	/// If board has empty column, move board's right side.
+	/// </summary>
 	private void SendLeftSide()
 	{
-		int movingLine = 0;
-		bool isLineMoved = false;
-        for (int h = 0; h < Width; h++)
-        {
-            if (myTile[h, 0] == null)
-            {
-				movingLine++;
-				isLineMoved = true;
-			}
-            else
-            {
-                if (movingLine > 0)
+		DOTween.To(value => { }, startValue: 0, endValue: 1, duration: DoTweenDuration * 2)
+				.OnComplete(() =>
 				{
-					for (int e = h; e < Width; e++)
+					int movingLine = 0;
+					bool isLineMoved = false;
+					for (int h = 0; h < Width; h++)
 					{
-						for (int c = 0; c < Height; c++)
+						if (myTile[h, 0] == null)
 						{
-							if (myTile[e, c] == null)
+							movingLine++;
+							isLineMoved = true;
+						}
+						else
+						{
+							if (movingLine > 0)
 							{
-								continue;
+								for (int e = h; e < Width; e++)
+								{
+									for (int c = 0; c < Height; c++)
+									{
+										if (myTile[e, c] == null)
+										{
+											continue;
+										}
+										SendAnotherCoordinateToTile(e, c, new Vector2Int(e - movingLine, c));
+									}
+								}
+								movingLine = 0;
 							}
-							SendAnotherCoordinateToTile(e, c, new Vector2Int(e - movingLine, c));
 						}
 					}
-					movingLine = 0;
-				}
-            }
-		}
-        if (isLineMoved)
-		{
-			LearnNeighbors();
-		}
-		ClearChoosedTile();
+					if (isLineMoved)
+					{
+						LearnNeighbors();
+					}
+					ClearChoosedTile();
+				});
 	}
+	/// <summary>
+	/// Send down tiles if their below tiles is null.
+	/// </summary>
 	private void GoDownTile()
 	{
-		SwapTilesList();
-		int totalSwapTiles = 0;
+		SetSwapTilesList();
 		for (int e = 0; e < Width; e++)
 		{
 			for (int c = 0; c < Height; c++)
@@ -259,8 +237,6 @@ public class Board_Manager : MonoBehaviour
 				{
 					totalSwapTiles++;
 					var tile = Instantiate(boardTilePrefab, new Vector3(e, Height + swapTiles[e].Count, 0), Quaternion.identity, boardTileParent);
-					//tile.name = "Tile : " + e + " --- " + c;
-					//myTile[e, c] = tile;
 					Item item = boardItemList[Random.Range(0, boardItemList.Count)];
 					tile.SetMyTile(item);
 
@@ -276,6 +252,13 @@ public class Board_Manager : MonoBehaviour
 				}
 			}
 		}
+		SendDownNewTiles();
+	}
+	/// <summary>
+	/// Send new tiles to their new coordinate.
+	/// </summary>
+	private void SendDownNewTiles()
+	{
 		DOTween.To(value => { },
 			startValue: 0, endValue: 1, duration: DoTweenDuration * 2)
 			.OnComplete(() =>
@@ -294,7 +277,7 @@ public class Board_Manager : MonoBehaviour
 						swapTiles[e][c].transform.DOMove(newPos, DoTweenDuration).OnComplete(() =>
 						{
 							totalSwapTiles--;
-                            if (totalSwapTiles == 0)
+							if (totalSwapTiles == 0)
 							{
 								LearnNeighbors();
 								ClearChoosedTile();
@@ -328,6 +311,29 @@ public class Board_Manager : MonoBehaviour
 				myTile[h, e].SetMyNeighbors();
 			}
 		}
+	}
+	/// <summary>
+	/// Clear swap tiles list for next step.
+	/// </summary>
+	private void SetSwapTilesList()
+	{
+		swapTiles.Clear();
+		for (int e = 0; e < width; e++)
+		{
+			int order = e;
+			swapTiles.Add(order, new List<Tile>());
+		}
+	}
+	private void SetChoosedTile(Tile tile)
+	{
+		choosedTile = tile;
+		choosedTiles.Add(choosedTile);
+	}
+	private void ClearChoosedTile()
+	{
+		waitForChoosing = false;
+		choosedTile = null;
+		choosedTiles.Clear();
 	}
 	public void SetScore()
     {
