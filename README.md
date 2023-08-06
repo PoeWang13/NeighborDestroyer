@@ -1,5 +1,5 @@
 # NeighborDestroyer
-Click on it and it will destroy its neighbors. İstediğiniz gibi kullanabilirsiniz. Herhangi bir tavsiye, uyarı veya bug için 13yedecim13@gmail.com
+Double click on it and it will destroy its neighbors. İstediğiniz gibi kullanabilirsiniz. Herhangi bir tavsiye, uyarı veya bug için 13yedecim13@gmail.com
 
 # Game_Manager
 Oyunu başlatan ve boardın büyüklüğüne karar veren scriptir.
