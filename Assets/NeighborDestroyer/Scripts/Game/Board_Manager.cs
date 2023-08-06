@@ -172,7 +172,7 @@ public class Board_Manager : MonoBehaviour
                 {
 					continue;
                 }
-				SendAnotherCoordinateToTile(h, e, new Vector2Int(h, yeni));
+				SendTileToAnotherCoordinate(h, e, new Vector2Int(h, yeni));
 
 				yeni++;
             }
@@ -209,7 +209,7 @@ public class Board_Manager : MonoBehaviour
 										{
 											continue;
 										}
-										SendAnotherCoordinateToTile(e, c, new Vector2Int(e - movingLine, c));
+										SendTileToAnotherCoordinate(e, c, new Vector2Int(e - movingLine, c));
 									}
 								}
 								movingLine = 0;
@@ -247,7 +247,7 @@ public class Board_Manager : MonoBehaviour
 				{
 					if (swapTiles[e].Count > 0)
 					{
-						SendAnotherCoordinateToTile(e, c, new Vector2Int(e, c - swapTiles[e].Count));
+						SendTileToAnotherCoordinate(e, c, new Vector2Int(e, c - swapTiles[e].Count));
 					}
 				}
 			}
@@ -287,7 +287,7 @@ public class Board_Manager : MonoBehaviour
 				}
 			});
 	}
-	private Tile SendAnotherCoordinateToTile(int oldX, int oldY, Vector2Int newCoordinate)
+	private Tile SendTileToAnotherCoordinate(int oldX, int oldY, Vector2Int newCoordinate)
 	{
 		Tile tile = myTile[oldX, oldY];
 		myTile[oldX, oldY] = null;

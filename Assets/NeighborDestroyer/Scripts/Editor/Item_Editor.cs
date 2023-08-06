@@ -33,7 +33,10 @@ public class Item_Editor : Editor
 
             EditorGUI.PropertyField(resimRect, icon, new GUIContent(" "));
             Texture2D texture2D = AssetPreview.GetAssetPreview(myItem.icon);
-            GUI.DrawTexture(textureRect, texture2D);
+            if (texture2D != null)
+            {
+                GUI.DrawTexture(textureRect, texture2D);
+            }
             EditorGUILayout.EndHorizontal();
         }
         else
