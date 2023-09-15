@@ -8,16 +8,21 @@ public class Board_Manager : MonoBehaviour
 	public static Board_Manager Instance { get => instance; }
 
 	private const float DoTweenDuration = 0.25f;
+
 	[SerializeField] private bool shrinkingBoard;
+	[SerializeField] private int scoreLimit;
+	[SerializeField] private int stepLimit;
 	[SerializeField] private Tile boardTilePrefab;
     [SerializeField] private Transform boardTileParent;
     [SerializeField] private List<Item> boardItemList = new List<Item>();
 
+	private int stepLimitMax;
 	private int score;
 	private int scoreAdd = 0;
     private int width;
 	private int height;
 	private int totalSwapTiles = 0;
+	private bool gameStart;
 	private bool waitForChoosing;
 	private Tile choosedTile;
 	private List<Tile> choosedTiles = new List<Tile>();
@@ -29,14 +34,16 @@ public class Board_Manager : MonoBehaviour
 	public int Height { get => height; }
 	public int ScoreAdd { get => scoreAdd; }
 	public int Score { get => score; set => score = value; }
+	public int Step { get => stepLimitMax; }
 
 	[ContextMenu("Set Board")]
 	private void SetBoard()
 	{
-        for (int e = boardTileParent.childCount - 1; e >= 0 ; e--)
-        {
+		Canvas_Manager.Instance.SetActiveLevelFinishPanel(false);
+		for (int e = boardTileParent.childCount - 1; e >= 0; e--)
+		{
 			Destroy(boardTileParent.GetChild(e).gameObject);
-        }
+		}
 		SetBoard(Game_Manager.Instance.BoardSize);
 	}
 	private void Awake()
@@ -60,7 +67,11 @@ public class Board_Manager : MonoBehaviour
 		height = boardSize.y;
 		myTile = new Tile[width, height];
 		choosedTiles.Clear();
-        if (!shrinkingBoard)
+		score = 0;
+		stepLimitMax = 0;
+		gameStart = true;
+
+		if (!shrinkingBoard)
 		{
 			SetSwapTilesList();
 		}
@@ -84,12 +95,16 @@ public class Board_Manager : MonoBehaviour
 		}
 	}
 	public void ChooseTile(Tile tile)
-    {
-        if (waitForChoosing)
-        {
+	{
+		if (waitForChoosing)
+		{
 			return;
-        }
-        if (choosedTile == null)
+		}
+		if (!gameStart)
+		{
+			return;
+		}
+		if (choosedTile == null)
 		{
 			SetChoosedTile(tile);
 		}
@@ -109,6 +124,7 @@ public class Board_Manager : MonoBehaviour
 	private void CheckBoardForConnecting()
 	{
 		waitForChoosing = true;
+		stepLimitMax++;
 		for (int h = 0; h < choosedTiles.Count; h++)
         {
 			var myNeighbors = choosedTiles[h].MyNeighbors;
@@ -221,6 +237,8 @@ public class Board_Manager : MonoBehaviour
 						LearnNeighbors();
 					}
 					ClearChoosedTile();
+					CheckGameFinish();
+					CheckOtherMoves();
 				});
 	}
 	/// <summary>
@@ -279,8 +297,10 @@ public class Board_Manager : MonoBehaviour
 							totalSwapTiles--;
 							if (totalSwapTiles == 0)
 							{
+								CheckGameFinish();
 								LearnNeighbors();
 								ClearChoosedTile();
+								CheckOtherMoves();
 							}
 						});
 					}
@@ -300,6 +320,7 @@ public class Board_Manager : MonoBehaviour
 	}
 	private void LearnNeighbors()
 	{
+		Debug.Log("Learn Neighbors");
 		for (int h = 0; h < Width; h++)
 		{
 			for (int e = 0; e < Height; e++)
@@ -334,6 +355,96 @@ public class Board_Manager : MonoBehaviour
 		waitForChoosing = false;
 		choosedTile = null;
 		choosedTiles.Clear();
+	}
+	private void CheckGameFinish()
+	{
+		Debug.Log("Check Game Finish");
+		if (stepLimit == 0) // Sadece belli bir score geçilmesi isteniyor
+		{
+			CheckScoreLimit();
+		}
+		else // Belli bir step içinde belli bir score geçilmesi isteniyor.
+		{
+			if (stepLimitMax >= stepLimit)
+			{
+				if (!CheckScoreLimit())
+				{
+					gameStart = false;
+					Canvas_Manager.Instance.LevelLost();
+				}
+			}
+			else
+			{
+				CheckScoreLimit();
+			}
+		}
+	}
+	private bool CheckScoreLimit()
+	{
+		if (score >= scoreLimit)
+		{
+			gameStart = false;
+			Canvas_Manager.Instance.LevelWin();
+			return true;
+		}
+		return false;
+
+	}
+	private void CheckOtherMoves()
+	{
+		List<Tile> checkedTiles = new List<Tile>();
+		bool foundMoves = false;
+		// Control all tiles for move.
+		for (int e = 0; e < Width && !foundMoves; e++)
+        {
+            for (int h = 0; h < Height && !foundMoves; h++)
+            {
+                if (myTile[e, h] == null)
+                {
+                    continue;
+                }
+                if (checkedTiles.Contains(myTile[e, h]))
+				{
+					// Tile checked so dont check anymore.
+					continue;
+				}
+				checkedTiles.Add(myTile[e, h]);
+
+				// Check new tile has moves
+				List<Tile> checkedNeighborTiles = new List<Tile>();
+				checkedNeighborTiles.Add(myTile[e, h]);
+                for (int i = 0; i < checkedNeighborTiles.Count && !foundMoves; i++)
+				{
+					var myNeighbors = checkedNeighborTiles[i].MyNeighbors;
+					for (int c = 0; c < myNeighbors.Length && !foundMoves; c++)
+					{
+						if (myNeighbors[c] == null)
+						{
+							continue;
+						}
+						if (checkedNeighborTiles.Contains(myNeighbors[c]))
+						{
+							continue;
+						}
+						if (myNeighbors[c].MyItem == checkedNeighborTiles[0].MyItem)
+						{
+							checkedTiles.Add(myNeighbors[c]);
+							checkedNeighborTiles.Add(myNeighbors[c]);
+                            if (checkedNeighborTiles.Count > 2)
+                            {
+								foundMoves = true;
+								Debug.Log("Found Moves");
+							}
+						}
+					}
+                }
+			}
+        }
+        if (!foundMoves)
+		{
+			// There is not move for game so game is over.
+			Canvas_Manager.Instance.LevelLost();
+		}
 	}
 	public void SetScore()
     {
