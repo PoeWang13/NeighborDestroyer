@@ -1,3 +1,12 @@
+# Bilgilendirme Videoları
+Oyun boardı nasıl düzenlenir, boyutları nasıl ayarlanır, hangi itemler gösterilir? Bunlarla ilgili kısa video.
+
+https://youtu.be/zzLVt2L-iD8
+
+Level kazanmak için ne kadar puan gerekli ve en fazla kaç step yapabilir? Bu kuralların nereden ayarlandığını gösteren kısa video.
+
+https://youtu.be/OJyQoczKw7Q
+
 # NeighborDestroyer
 Double click on it and it will destroy its neighbors. İstediğiniz gibi kullanabilirsiniz. Herhangi bir tavsiye, uyarı veya bug için 13yedecim13@gmail.com
 
