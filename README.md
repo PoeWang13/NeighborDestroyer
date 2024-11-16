@@ -1,3 +1,16 @@
+# Informational Videos
+How to organize the game board, how to adjust its dimensions, what items are displayed? Short video about these.
+
+https://youtu.be/_OZ7jC75Rpk
+
+How many points are required to gain a level and how many steps can be done at most? Short video showing where these rules are set.
+
+https://youtu.be/N6wm_O3HjAY
+
+Short video about how the board is constantly refreshed or how the items disappear permanently and how the empty columns are moved.
+
+https://youtu.be/l12pTZrtdjg
+
 # NeighborDestroyer
 Double click on it and it will destroy its neighbors. İstediğiniz gibi kullanabilirsiniz. Herhangi bir tavsiye, uyarı veya bug için 13yedecim13@gmail.com
 
