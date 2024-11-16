@@ -681,9 +681,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 691045405}
+  - component: {fileID: 691045402}
   - component: {fileID: 691045404}
   - component: {fileID: 691045403}
-  - component: {fileID: 691045402}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -733,9 +733,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54c0c8b2354727a4d861643393b26af3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shrinkingBoard: 1
-  scoreLimit: 3
-  stepLimit: 1
+  shrinkingBoard: 0
+  scoreLimit: 5555
+  stepLimit: 55
   boardTilePrefab: {fileID: 6445333425389214006, guid: bfb44cfd4bba5dc4e9de72400e6f9118,
     type: 3}
   boardTileParent: {fileID: 1867044121}
@@ -743,7 +743,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 946288dd91137de4c87c2634b550beae, type: 2}
   - {fileID: 11400000, guid: 78ba9473b70f0214a9bf68200a044f18, type: 2}
   - {fileID: 11400000, guid: db61946f271220e4cb627cb45184e236, type: 2}
-  - {fileID: 11400000, guid: 16b9ea8f66373ef4db7c330f22c32432, type: 2}
 --- !u!4 &691045405
 Transform:
   m_ObjectHideFlags: 0
@@ -1645,7 +1644,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.48235294, g: 0.4745098, b: 0.4745098, a: 0.392}
+  m_Color: {r: 0.48235294, g: 0.4745098, b: 0.4745098, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
